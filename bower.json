@@ -1,0 +1,10 @@
+{
+  "name": "leaflet-switch-scale-control",
+  "dependencies": {
+    "leaflet": "1.0.1",
+    "semantic-ui": "^2.2.4"
+  },
+  "resolutions": {
+    "leaflet": "1.0.1"
+  }
+}
