@@ -8,14 +8,22 @@ L.Control.SwitchScaleControl = L.Control.extend({
     ratioPrefix: '1:',
     ratioCustomItemText: '1: другой...',
     ratioMenu: true,
-    getWorldRect: null /* L.LatLngBounds to world coordinates; needed if ratio: true */,
-    setWorldRect: null /* Sets world coordinates; needed if ratio: true && ratioMenu: true */,
-    pixelsInMeterWidth: false /* Returns pixels per meter; needed if ratio: true */,
-    getBoundsWidthInMeters: null /* Returns width in meters of specified area L.LatLngBounds. */
+    pixelsInMeterWidth: function() { /* Returns pixels per meter; needed if ratio: true */
+      let div = document.createElement("div");
+      div.style.cssText = "position: absolute;  left: -100%;  top: -100%;  width: 100cm;";
+      document.body.appendChild(div);
+      let px = div.offsetWidth;
+      document.body.removeChild(div);
+      return px;
+    },
+    getMapWidthForLanInMeters: function(currentLan) { /* Returns width of map in meters on specified latitude.*/
+      return 6378137 * 2 * Math.PI * Math.cos(currentLan * Math.PI / 180);
+    }
   },
 
   onAdd: function (map) {
     this._map = map;
+    this._pixelsInMeterWidth = this.options.pixelsInMeterWidth();
 
     let className = this.options.className,
       container = L.DomUtil.create('div', 'leaflet-control-scale ' + className),
@@ -67,18 +75,12 @@ L.Control.SwitchScaleControl = L.Control.extend({
         });
 
         let setScaleRatio = function (scaleRatio) {
-          let size = this._map.getSize(),
-          dist = scaleRatio * size.x / this._getDpm(),
-          bounds = this._map.getBounds(),
-          worldRect = options.getWorldRect(this._map, bounds),
-          newHeight = dist * worldRect.Height / worldRect.Width;
-
-          worldRect.Left += (worldRect.Width - dist) / 2;
-          worldRect.Top += (worldRect.Height - newHeight) / 2 + newHeight;
-          worldRect.Height = newHeight;
-          worldRect.Width = dist;
-
-          options.setWorldRect(this._map, worldRect);
+          if (scaleRatio) {
+            let bounds = this._map.getBounds(),
+            centerLat = bounds.getCenter().lat,
+            crsScale = this._pixelsInMeterWidth * options.getMapWidthForLanInMeters(centerLat) / scaleRatio;
+            this._map.setZoom(this._map.options.crs.zoom(crsScale));
+          }
         };
 
         let myCustomScale = L.DomUtil.create('div', className + '-ratiomenu-item custom-scale', dropMenu);
@@ -140,37 +142,19 @@ L.Control.SwitchScaleControl = L.Control.extend({
     }
   },
 
-  _getDpm: function () {
-    let pixelsInMeterWidth = this.options.pixelsInMeterWidth;
-
-    if (typeof pixelsInMeterWidth === "function") {
-      return pixelsInMeterWidth();
-    } else if (typeof pixelsInMeterWidth === "number") {
-      return pixelsInMeterWidth;
-    } else {
-      throw 'options.pixelsInMeterWidth has wrong type';
-    }
-  },
-
   _update: function () {
     let dist,
       bounds = this._map.getBounds(),
       options = this.options;
 
-    if (typeof options.getBoundsWidthInMeters !== "function") {
-      let centerLat = bounds.getCenter().lat,
-        halfWorldMeters = 6378137 * Math.PI * Math.cos(centerLat * Math.PI / 180);
-        dist = halfWorldMeters * (bounds.getNorthEast().lng - bounds.getSouthWest().lng) / 180;
-    } else {
-      dist = options.getBoundsWidthInMeters(bounds);
-    }
+    let centerLat = bounds.getCenter().lat;
 
     let size = this._map.getSize(),
       physicalScaleRatio = 0;
 
     if (size.x > 0) {
       if (options.ratio) {
-        physicalScaleRatio = this._getDpm() * dist / size.x;
+        physicalScaleRatio = this._pixelsInMeterWidth * options.getMapWidthForLanInMeters(centerLat) / this._map.options.crs.scale(this._map.getZoom());
       }
     }
 
