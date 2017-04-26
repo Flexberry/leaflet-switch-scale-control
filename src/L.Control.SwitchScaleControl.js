@@ -127,6 +127,9 @@ L.Control.SwitchScaleControl = L.Control.extend({
         $(this._rScaleMenu).on('click', '.' + className + '-ratiomenu-item', { context: this }, function (e) {
           if (this.scaleRatio) {
             $.proxy(setScaleRatio, e.data.context)(this.scaleRatio);
+            if ($(this).hasClass('custom-scale')) {
+              this.scaleRatio = undefined;
+            }
           } else {
             e.stopPropagation();
           }
