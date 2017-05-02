@@ -9,10 +9,10 @@ L.Control.SwitchScaleControl = L.Control.extend({
     ratioCustomItemText: '1: другой...',
     ratioMenu: true,
     pixelsInMeterWidth: function() { /* Returns pixels per meter; needed if ratio: true */
-      let div = document.createElement('div');
+      var div = document.createElement('div');
       div.style.cssText = 'position: absolute;  left: -100%;  top: -100%;  width: 100cm;';
       document.body.appendChild(div);
-      let px = div.offsetWidth;
+      var px = div.offsetWidth;
       document.body.removeChild(div);
       return px;
     },
@@ -25,7 +25,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
     this._map = map;
     this._pixelsInMeterWidth = this.options.pixelsInMeterWidth();
 
-    let className = this.options.className,
+    var className = this.options.className,
       container = L.DomUtil.create('div', 'leaflet-control-scale ' + className),
       options = this.options;
 
@@ -51,18 +51,18 @@ L.Control.SwitchScaleControl = L.Control.extend({
     if (options.ratio) {
       this._rScaleMenu = L.DomUtil.create('div', className + '-ratiomenu ui dropdown', container);
 
-      let scales = [500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000];
+      var scales = [500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000];
       this._rScaleMenuText = L.DomUtil.create('text', '', this._rScaleMenu);
       if (options.ratioMenu) {
-        let dropMenu = L.DomUtil.create('div', 'menu', this._rScaleMenu);
+        var dropMenu = L.DomUtil.create('div', 'menu', this._rScaleMenu);
         $.each(scales, function (i, scaleRatio) {
-          let menuitem = L.DomUtil.create('div', className + '-ratiomenu-item item', dropMenu);
+          var menuitem = L.DomUtil.create('div', className + '-ratiomenu-item item', dropMenu);
           menuitem.scaleRatio = scaleRatio;
           menuitem.style.setProperty('padding', '0.2em', 'important');
 
-          let scaleRatioText = scaleRatio.toString();
+          var scaleRatioText = scaleRatio.toString();
           if (scaleRatioText.length > 3) { // 1500000 -> 1'500'000
-            let joinerChar = '\'';
+            var joinerChar = '\'';
             scaleRatioText = scaleRatioText.split('').reverse().join('').replace(/([0-9]{3})/g, '$1' + joinerChar);
             if (scaleRatioText[scaleRatioText.length - 1] === joinerChar) {
               scaleRatioText = scaleRatioText.slice(0, -1);
@@ -74,31 +74,31 @@ L.Control.SwitchScaleControl = L.Control.extend({
           menuitem.innerHTML = options.ratioPrefix + scaleRatioText;
         });
 
-        let setScaleRatio = function (scaleRatio) {
+        var setScaleRatio = function (scaleRatio) {
           if (scaleRatio) {
-            let bounds = this._map.getBounds(),
+            var bounds = this._map.getBounds(),
             centerLat = bounds.getCenter().lat,
             crsScale = this._pixelsInMeterWidth * options.getMapWidthForLanInMeters(centerLat) / scaleRatio;
             this._map.setZoom(this._map.options.crs.zoom(crsScale));
           }
         };
 
-        let myCustomScale = L.DomUtil.create('div', className + '-ratiomenu-item custom-scale', dropMenu);
+        var myCustomScale = L.DomUtil.create('div', className + '-ratiomenu-item custom-scale', dropMenu);
         myCustomScale.title = 'Задайте свой масштаб и нажмите Enter';
 
-        let customScaleInput = L.DomUtil.create('input', className + '-customratio-input custom-scale-input', myCustomScale);
+        var customScaleInput = L.DomUtil.create('input', className + '-customratio-input custom-scale-input', myCustomScale);
         customScaleInput.style.setProperty('padding', '0.2em', 'important');
         customScaleInput.type = 'text';
         customScaleInput.setAttribute('value', options.ratioCustomItemText);
         this._customScaleInput = customScaleInput;
-        let _this = this;
+        var _this = this;
 
         $(customScaleInput).on('focus', function (e) {
           if (this.value === options.ratioCustomItemText) {
             this.value = options.ratioPrefix;
 
             if (this.createTextRange) { // for IE.
-              let r = this.createTextRange();
+              var r = this.createTextRange();
               r.moveStart('character', this.value.length);
               r.select();
             }
@@ -110,7 +110,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
         $(customScaleInput).on('keydown', { context: this }, function (e) {
           if (e.which === 13) {
             $(_this._rScaleMenu).dropdown('hide');
-            let scaleRatioFound = this.value.replace(' ', '').replace('\'', '').match(/^(1:){0,1}([0-9]*)$/);
+            var scaleRatioFound = this.value.replace(' ', '').replace('\'', '').match(/^(1:){0,1}([0-9]*)$/);
             if (!scaleRatioFound || !scaleRatioFound[2] /* ([0-9]*) group */) {
               setTimeout(function () { alert('Пожалуйста, укажите масштаб в формате "1:100000" или "100000"'); }, 1);
               return false;
@@ -146,13 +146,13 @@ L.Control.SwitchScaleControl = L.Control.extend({
   },
 
   _update: function () {
-    let dist,
+    var dist,
       bounds = this._map.getBounds(),
       options = this.options;
 
-    let centerLat = bounds.getCenter().lat;
+    var centerLat = bounds.getCenter().lat;
 
-    let size = this._map.getSize(),
+    var size = this._map.getSize(),
       physicalScaleRatio = 0;
 
     if (size.x > 0) {
