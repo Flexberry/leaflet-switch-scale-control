@@ -9,8 +9,8 @@ L.Control.SwitchScaleControl = L.Control.extend({
     ratioCustomItemText: '1: другой...',
     ratioMenu: true,
     pixelsInMeterWidth: function() { /* Returns pixels per meter; needed if ratio: true */
-      let div = document.createElement("div");
-      div.style.cssText = "position: absolute;  left: -100%;  top: -100%;  width: 100cm;";
+      let div = document.createElement('div');
+      div.style.cssText = 'position: absolute;  left: -100%;  top: -100%;  width: 100cm;';
       document.body.appendChild(div);
       let px = div.offsetWidth;
       document.body.removeChild(div);
