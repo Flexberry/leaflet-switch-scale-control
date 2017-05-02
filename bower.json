@@ -1,10 +1,17 @@
 {
   "name": "leaflet-switch-scale-control",
+  "license": "MIT",
+  "main": [
+    "src/L.Control.SwitchScaleControl.js",
+    "src/L.Control.SwitchScaleControl.css"
+  ],
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "examples"
+  ],
   "dependencies": {
     "leaflet": "1.0.1",
     "semantic-ui": "^2.2.4"
-  },
-  "resolutions": {
-    "leaflet": "1.0.1"
   }
 }
