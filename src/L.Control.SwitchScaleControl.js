@@ -12,6 +12,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
     recalcOnPositionChange: false, /* If recalcOnZoomChange is false, then it's always false */
     recalcOnZoomChange: false,
     scales: [500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000],
+    roundScales: undefined,
     pixelsInMeterWidth: function() { /* Returns pixels per meter; needed if ratio: true */
       var div = document.createElement('div');
       div.style.cssText = 'position: absolute;  left: -100%;  top: -100%;  width: 100cm;';
@@ -214,7 +215,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
   },
 
   _roundScale: function(physicalScaleRatio) {
-    var scales = this.options.scales;
+    var scales = this.options.roundScales || this.options.scales;
 
     if (physicalScaleRatio < scales[0]) {
       return scales[0];
