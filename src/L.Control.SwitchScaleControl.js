@@ -7,6 +7,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
     ratio: true,
     ratioPrefix: '1:',
     ratioCustomItemText: '1: другой...',
+    customScaleTitle: 'Задайте свой масштаб и нажмите Enter',
     ratioMenu: true,
     recalcOnPositionChange: false, /* If recalcOnZoomChange is false, then it's always false */
     recalcOnZoomChange: false,
@@ -104,10 +105,9 @@ L.Control.SwitchScaleControl = L.Control.extend({
         };
 
         var myCustomScale = L.DomUtil.create('div', className + '-ratiomenu-item custom-scale', dropMenu);
-        myCustomScale.title = 'Задайте свой масштаб и нажмите Enter';
+        myCustomScale.title = options.customScaleTitle;
 
         var customScaleInput = L.DomUtil.create('input', className + '-customratio-input custom-scale-input', myCustomScale);
-        customScaleInput.style.setProperty('padding', '0.2em', 'important');
         customScaleInput.type = 'text';
         customScaleInput.setAttribute('value', options.ratioCustomItemText);
         this._customScaleInput = customScaleInput;
@@ -131,17 +131,21 @@ L.Control.SwitchScaleControl = L.Control.extend({
           if (e.which === 13) {
             $(_this._rScaleMenu).dropdown('hide');
             var scaleRatioFound = this.value.replace(' ', '').replace('\'', '').match(/^(1:){0,1}([0-9]*)$/);
-            if (!scaleRatioFound || !scaleRatioFound[2] /* ([0-9]*) group */) {
-              setTimeout(function () { alert('Пожалуйста, укажите масштаб в формате "1:100000" или "100000"'); }, 1);
-              return false;
+            if (scaleRatioFound && scaleRatioFound[2]) {
+              myCustomScale.scaleRatio = scaleRatioFound[2];
+              $(myCustomScale).click();
             }
 
-            myCustomScale.scaleRatio = scaleRatioFound[2];
-            $(myCustomScale).click();
             return false;
           }
 
           return true;
+        });
+
+        $(customScaleInput).on('keypress', { context: this }, function (e) {
+          if (e.charCode && (e.charCode < 48 || e.charCode > 57)) {
+            return false;
+          }
         });
 
         $(this._rScaleMenu).on('click', '.' + className + '-ratiomenu-item', { context: this }, function (e) {
