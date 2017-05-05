@@ -8,6 +8,9 @@ L.Control.SwitchScaleControl = L.Control.extend({
     ratioPrefix: '1:',
     ratioCustomItemText: '1: другой...',
     ratioMenu: true,
+    recalcOnPositionChange: false, /* If recalcOnZoomChange is false, then it's always false */
+    recalcOnZoomChange: false,
+    scales: [500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000],
     pixelsInMeterWidth: function() { /* Returns pixels per meter; needed if ratio: true */
       var div = document.createElement('div');
       div.style.cssText = 'position: absolute;  left: -100%;  top: -100%;  width: 100cm;';
@@ -31,8 +34,17 @@ L.Control.SwitchScaleControl = L.Control.extend({
 
     this._addScales(options, className, container);
 
-    map.on(options.updateWhenIdle ? 'moveend' : 'move', this._update, this);
-    map.whenReady(this._update, this);
+    if (options.recalcOnZoomChange) {
+      if (options.recalcOnPositionChange) {
+        map.on(options.updateWhenIdle ? 'moveend' : 'move', this._update, this);
+      } else {
+        map.on(options.updateWhenIdle ? 'zoomend' : 'zoom', this._update, this);
+      }
+    } else {
+      map.on(options.updateWhenIdle ? 'zoomend' : 'zoom', this._updateRound, this);
+    }
+
+    map.whenReady(options.recalcOnZoomChange ? this._update : this._updateRound, this);
 
     L.DomEvent.disableClickPropagation(container);
 
@@ -40,7 +52,15 @@ L.Control.SwitchScaleControl = L.Control.extend({
   },
 
   onRemove: function (map) {
-    map.off(this.options.updateWhenIdle ? 'moveend' : 'move', this._update, this);
+    if (this.options.recalcOnZoomChange) {
+      if (this.options.recalcOnPositionChange) {
+        map.off(this.options.updateWhenIdle ? 'moveend' : 'move', this._update, this);
+      } else {
+        map.off(this.options.updateWhenIdle ? 'zoomend' : 'zoom', this._update, this);
+      }
+    } else {
+      map.off(options.updateWhenIdle ? 'zoomend' : 'zoom', this._updateRound, this);
+    }
   },
 
   onDropdownShow: function () {
@@ -51,7 +71,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
     if (options.ratio) {
       this._rScaleMenu = L.DomUtil.create('div', className + '-ratiomenu ui dropdown', container);
 
-      var scales = [500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000];
+      var scales = options.scales;
       this._rScaleMenuText = L.DomUtil.create('text', '', this._rScaleMenu);
       if (options.ratioMenu) {
         var dropMenu = L.DomUtil.create('div', 'menu', this._rScaleMenu);
@@ -126,6 +146,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
 
         $(this._rScaleMenu).on('click', '.' + className + '-ratiomenu-item', { context: this }, function (e) {
           if (this.scaleRatio) {
+            _this._fixedScale = this.scaleRatio;
             $.proxy(setScaleRatio, e.data.context)(this.scaleRatio);
             if ($(this).hasClass('custom-scale')) {
               this.scaleRatio = undefined;
@@ -145,7 +166,15 @@ L.Control.SwitchScaleControl = L.Control.extend({
     }
   },
 
+  _updateRound: function() {
+    this._updateFunction(true);
+  },
+
   _update: function () {
+    this._updateFunction(false);
+  },
+
+  _updateFunction: function(isRound) {
     var dist,
       bounds = this._map.getBounds(),
       options = this.options;
@@ -161,16 +190,42 @@ L.Control.SwitchScaleControl = L.Control.extend({
       }
     }
 
-    this._updateScales(options, physicalScaleRatio);
+    this._updateScales(options, physicalScaleRatio, isRound);
   },
 
-  _updateScales: function (options, physicalScaleRatio) {
+  _updateScales: function (options, physicalScaleRatio, isRound) {
     if (options.ratio && physicalScaleRatio) {
-      this._updateRatio(physicalScaleRatio);
+      this._updateRatio(physicalScaleRatio, isRound);
     }
   },
 
-  _updateRatio: function (physicalScaleRatio) {
-    this._rScaleMenuText.innerHTML = this.options.ratioPrefix + Math.round(physicalScaleRatio);
+  _updateRatio: function (physicalScaleRatio, isRound) {
+    if (this._fixedScale) {
+      this._rScaleMenuText.innerHTML = this.options.ratioPrefix + this._fixedScale;
+      this._fixedScale = undefined;
+    } else {
+      var scaleText = isRound ? this._roundScale(physicalScaleRatio) : Math.round(physicalScaleRatio);
+      this._rScaleMenuText.innerHTML = this.options.ratioPrefix + scaleText;
+    }
+  },
+
+  _roundScale: function(physicalScaleRatio) {
+    var scales = this.options.scales;
+
+    if (physicalScaleRatio < scales[0]) {
+      return scales[0];
+    }
+
+    if (physicalScaleRatio > scales[scales.length - 1]) {
+      return scales[scales.length - 1];
+    }
+
+    for (var i = 0; i < scales.length - 1; i++) {
+      if (physicalScaleRatio < scales[i + 1] && physicalScaleRatio >= scales[i]) {
+        return (scales[i + 1] + scales[i] - 2 * physicalScaleRatio) >= 0 ? scales[i] : scales[i + 1];
+      }
+    }
+
+    return Math.round(physicalScaleRatio);
   },
 });
