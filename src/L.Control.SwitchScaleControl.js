@@ -61,7 +61,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
         map.off(this.options.updateWhenIdle ? 'zoomend' : 'zoom', this._update, this);
       }
     } else {
-      map.off(options.updateWhenIdle ? 'zoomend' : 'zoom', this._updateRound, this);
+      map.off(this.options.updateWhenIdle ? 'zoomend' : 'zoom', this._updateRound, this);
     }
   },
 
