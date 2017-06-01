@@ -137,10 +137,10 @@ L.Control.SwitchScaleControl = L.Control.extend({
             $(_this._rScaleMenu).dropdown('hide');
             var scaleRatioFound = this.value.replace(' ', '').replace('\'', '').match(/^(1:){0,1}([0-9]*)$/);
             if (scaleRatioFound && scaleRatioFound[2]) {
-              let maxScale = Math.max.apply(null, scales);
+              var maxScale = Math.max.apply(null, scales);
 
               if (_this.options.adjustScales && scaleRatioFound[2] > maxScale) {
-                let maxRatioItem = $(dropMenu).children('.' + className + '-ratiomenu-item.item').last();
+                var maxRatioItem = $(dropMenu).children('.' + className + '-ratiomenu-item.item').last();
                 $(maxRatioItem).click();
               } else {
                 myCustomScale.scaleRatio = scaleRatioFound[2];
