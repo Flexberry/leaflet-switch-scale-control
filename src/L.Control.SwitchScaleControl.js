@@ -9,11 +9,13 @@ L.Control.SwitchScaleControl = L.Control.extend({
     ratioCustomItemText: '1: другой...',
     customScaleTitle: 'Задайте свой масштаб и нажмите Enter',
     ratioMenu: true,
-    recalcOnPositionChange: false, /* If recalcOnZoomChange is false, then it's always false */
+    /* If recalcOnZoomChange is false, then it's always false */
+    recalcOnPositionChange: false,
     recalcOnZoomChange: false,
     scales: [500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000],
     roundScales: undefined,
-    pixelsInMeterWidth: function() { /* Returns pixels per meter; needed if ratio: true */
+    adjustScales: false,
+    pixelsInMeterWidth: function () { /* Returns pixels per meter; needed if ratio: true */
       var div = document.createElement('div');
       div.style.cssText = 'position: absolute;  left: -100%;  top: -100%;  width: 100cm;';
       document.body.appendChild(div);
@@ -21,7 +23,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
       document.body.removeChild(div);
       return px;
     },
-    getMapWidthForLanInMeters: function(currentLan) { /* Returns width of map in meters on specified latitude.*/
+    getMapWidthForLanInMeters: function (currentLan) { /* Returns width of map in meters on specified latitude.*/
       return 6378137 * 2 * Math.PI * Math.cos(currentLan * Math.PI / 180);
     }
   },
@@ -99,8 +101,8 @@ L.Control.SwitchScaleControl = L.Control.extend({
         var setScaleRatio = function (scaleRatio) {
           if (scaleRatio) {
             var bounds = this._map.getBounds(),
-            centerLat = bounds.getCenter().lat,
-            crsScale = this._pixelsInMeterWidth * options.getMapWidthForLanInMeters(centerLat) / scaleRatio;
+              centerLat = bounds.getCenter().lat,
+              crsScale = this._pixelsInMeterWidth * options.getMapWidthForLanInMeters(centerLat) / scaleRatio;
             this._map.setZoom(this._map.options.crs.zoom(crsScale));
           }
         };
@@ -128,13 +130,22 @@ L.Control.SwitchScaleControl = L.Control.extend({
           e.stopPropagation();
         });
 
-        $(customScaleInput).on('keydown', { context: this }, function (e) {
+        $(customScaleInput).on('keydown', {
+          context: this
+        }, function (e) {
           if (e.which === 13) {
             $(_this._rScaleMenu).dropdown('hide');
             var scaleRatioFound = this.value.replace(' ', '').replace('\'', '').match(/^(1:){0,1}([0-9]*)$/);
             if (scaleRatioFound && scaleRatioFound[2]) {
-              myCustomScale.scaleRatio = scaleRatioFound[2];
-              $(myCustomScale).click();
+              var maxScale = Math.max.apply(null, scales);
+
+              if (_this.options.adjustScales && scaleRatioFound[2] > maxScale) {
+                var maxRatioItem = $(dropMenu).children('.' + className + '-ratiomenu-item.item').last();
+                $(maxRatioItem).click();
+              } else {
+                myCustomScale.scaleRatio = scaleRatioFound[2];
+                $(myCustomScale).click();
+              }
             }
 
             return false;
@@ -143,13 +154,17 @@ L.Control.SwitchScaleControl = L.Control.extend({
           return true;
         });
 
-        $(customScaleInput).on('keypress', { context: this }, function (e) {
+        $(customScaleInput).on('keypress', {
+          context: this
+        }, function (e) {
           if (e.charCode && (e.charCode < 48 || e.charCode > 57)) {
             return false;
           }
         });
 
-        $(this._rScaleMenu).on('click', '.' + className + '-ratiomenu-item', { context: this }, function (e) {
+        $(this._rScaleMenu).on('click', '.' + className + '-ratiomenu-item', {
+          context: this
+        }, function (e) {
           if (this.scaleRatio) {
             _this._fixedScale = this.scaleRatio;
             $.proxy(setScaleRatio, e.data.context)(this.scaleRatio);
@@ -165,13 +180,15 @@ L.Control.SwitchScaleControl = L.Control.extend({
 
         $(this._rScaleMenu).dropdown({
           direction: _this.options.dropdownDirection,
-          onShow: function() { _this.onDropdownShow.call(_this); },
+          onShow: function () {
+            _this.onDropdownShow.call(_this);
+          },
         });
       }
     }
   },
 
-  _updateRound: function() {
+  _updateRound: function () {
     this._updateFunction(true);
   },
 
@@ -179,7 +196,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
     this._updateFunction(false);
   },
 
-  _updateFunction: function(isRound) {
+  _updateFunction: function (isRound) {
     var dist,
       bounds = this._map.getBounds(),
       options = this.options;
@@ -214,7 +231,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
     }
   },
 
-  _roundScale: function(physicalScaleRatio) {
+  _roundScale: function (physicalScaleRatio) {
     var scales = this.options.roundScales || this.options.scales;
 
     if (physicalScaleRatio < scales[0]) {
