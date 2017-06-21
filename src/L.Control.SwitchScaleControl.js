@@ -9,13 +9,16 @@ L.Control.SwitchScaleControl = L.Control.extend({
     ratioCustomItemText: '1: другой...',
     customScaleTitle: 'Задайте свой масштаб и нажмите Enter',
     ratioMenu: true,
-    /* If recalcOnZoomChange is false, then it's always false */
+
+    // If recalcOnZoomChange is false, then recalcOnPositionChange is always false.
     recalcOnPositionChange: false,
     recalcOnZoomChange: false,
     scales: [500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000],
     roundScales: undefined,
     adjustScales: false,
-    pixelsInMeterWidth: function () { /* Returns pixels per meter; needed if ratio: true */
+
+    // Returns pixels per meter; needed if ratio: true.
+    pixelsInMeterWidth: function () {
       var div = document.createElement('div');
       div.style.cssText = 'position: absolute;  left: -100%;  top: -100%;  width: 100cm;';
       document.body.appendChild(div);
@@ -23,7 +26,9 @@ L.Control.SwitchScaleControl = L.Control.extend({
       document.body.removeChild(div);
       return px;
     },
-    getMapWidthForLanInMeters: function (currentLan) { /* Returns width of map in meters on specified latitude.*/
+
+    // Returns width of map in meters on specified latitude.
+    getMapWidthForLanInMeters: function (currentLan) {
       return 6378137 * 2 * Math.PI * Math.cos(currentLan * Math.PI / 180);
     }
   },
@@ -85,7 +90,9 @@ L.Control.SwitchScaleControl = L.Control.extend({
           menuitem.style.setProperty('padding', '0.2em', 'important');
 
           var scaleRatioText = scaleRatio.toString();
-          if (scaleRatioText.length > 3) { // 1500000 -> 1'500'000
+
+          // 1500000 -> 1'500'000
+          if (scaleRatioText.length > 3) {
             var joinerChar = '\'';
             scaleRatioText = scaleRatioText.split('').reverse().join('').replace(/([0-9]{3})/g, '$1' + joinerChar);
             if (scaleRatioText[scaleRatioText.length - 1] === joinerChar) {
@@ -120,7 +127,8 @@ L.Control.SwitchScaleControl = L.Control.extend({
           if (this.value === options.ratioCustomItemText) {
             this.value = options.ratioPrefix;
 
-            if (this.createTextRange) { // for IE.
+            // IE fix.
+            if (this.createTextRange) {
               var r = this.createTextRange();
               r.moveStart('character', this.value.length);
               r.select();
