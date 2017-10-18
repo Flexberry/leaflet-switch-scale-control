@@ -30,6 +30,22 @@ L.Control.SwitchScaleControl = L.Control.extend({
     // Returns width of map in meters on specified latitude.
     getMapWidthForLanInMeters: function (currentLan) {
       return 6378137 * 2 * Math.PI * Math.cos(currentLan * Math.PI / 180);
+    },
+
+    render: function (ratio) {
+      var scaleRatioText = ratio.toString();
+      // 1500000 -> 1'500'000
+      if (scaleRatioText.length > 3) {
+        var joinerChar = '\'';
+        scaleRatioText = scaleRatioText.split('').reverse().join('').replace(/([0-9]{3})/g, '$1' + joinerChar);
+        if (scaleRatioText[scaleRatioText.length - 1] === joinerChar) {
+          scaleRatioText = scaleRatioText.slice(0, -1);
+        }
+
+        scaleRatioText = scaleRatioText.split('').reverse().join('');
+      }
+
+      return this.options.ratioPrefix + scaleRatioText;
     }
   },
 
@@ -84,25 +100,12 @@ L.Control.SwitchScaleControl = L.Control.extend({
       this._rScaleMenuText = L.DomUtil.create('text', '', this._rScaleMenu);
       if (options.ratioMenu) {
         var dropMenu = L.DomUtil.create('div', 'menu', this._rScaleMenu);
+        var render = options.render.bind(this);
         $.each(scales, function (i, scaleRatio) {
           var menuitem = L.DomUtil.create('div', className + '-ratiomenu-item item', dropMenu);
           menuitem.scaleRatio = scaleRatio;
           menuitem.style.setProperty('padding', '0.2em', 'important');
-
-          var scaleRatioText = scaleRatio.toString();
-
-          // 1500000 -> 1'500'000
-          if (scaleRatioText.length > 3) {
-            var joinerChar = '\'';
-            scaleRatioText = scaleRatioText.split('').reverse().join('').replace(/([0-9]{3})/g, '$1' + joinerChar);
-            if (scaleRatioText[scaleRatioText.length - 1] === joinerChar) {
-              scaleRatioText = scaleRatioText.slice(0, -1);
-            }
-
-            scaleRatioText = scaleRatioText.split('').reverse().join('');
-          }
-
-          menuitem.innerHTML = options.ratioPrefix + scaleRatioText;
+          menuitem.innerHTML = render(scaleRatio);
         });
 
         var setScaleRatio = function (scaleRatio) {
@@ -231,11 +234,11 @@ L.Control.SwitchScaleControl = L.Control.extend({
 
   _updateRatio: function (physicalScaleRatio, isRound) {
     if (this._fixedScale) {
-      this._rScaleMenuText.innerHTML = this.options.ratioPrefix + this._fixedScale;
+      this._rScaleMenuText.innerHTML = this.options.render.call(this, this._fixedScale);
       this._fixedScale = undefined;
     } else {
       var scaleText = isRound ? this._roundScale(physicalScaleRatio) : Math.round(physicalScaleRatio);
-      this._rScaleMenuText.innerHTML = this.options.ratioPrefix + scaleText;
+      this._rScaleMenuText.innerHTML = this.options.render.call(this, scaleText);
     }
   },
 

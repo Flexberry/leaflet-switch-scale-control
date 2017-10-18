@@ -26,6 +26,7 @@ Specified below values are default
     adjustScales: false, // Flag: whether to adjust custom scale to max of scales
     pixelsInMeterWidth: function,
     getMapWidthForLanInMeters: function
+    render: function
 ```
 #### pixelsInMeterWidth: returns pixels per meter; needed if ratio: true.
 ```javascript
@@ -42,5 +43,12 @@ Specified below values are default
 ```javascript
     getMapWidthForLanInMeters: function (currentLan) {
       return 6378137 * 2 * Math.PI * Math.cos(currentLan * Math.PI / 180);
+    }
+```
+
+#### render: returns the scale rendered for HTML; if provided, ratioPrefix is ignored
+```javascript
+    render: function (ratio) {
+      return 'The current scale is 1 : ' + ratio;
     }
 ```
