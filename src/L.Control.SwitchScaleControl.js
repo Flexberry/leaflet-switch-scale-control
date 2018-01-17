@@ -1,3 +1,5 @@
+// var L = require('leaflet');
+
 L.Control.SwitchScaleControl = L.Control.extend({
   options: {
     position: 'bottomleft',
@@ -6,15 +8,15 @@ L.Control.SwitchScaleControl = L.Control.extend({
     updateWhenIdle: false,
     ratio: true,
     ratioPrefix: '1:',
-    ratioCustomItemText: '1: другой...',
-    customScaleTitle: 'Задайте свой масштаб и нажмите Enter',
+    ratioCustomItemText: '1: Entrez une valeur',
+    customScaleTitle: 'Entrez une valeur et appuyez sur ENtrée',
     ratioMenu: true,
 
     // If recalcOnZoomChange is false, then recalcOnPositionChange is always false.
     recalcOnPositionChange: false,
     recalcOnZoomChange: false,
     scales: [500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000],
-    roundScales: undefined,
+    roundScales: null,
     adjustScales: false,
 
     // Returns pixels per meter; needed if ratio: true.
@@ -37,9 +39,9 @@ L.Control.SwitchScaleControl = L.Control.extend({
     this._map = map;
     this._pixelsInMeterWidth = this.options.pixelsInMeterWidth();
 
-    var className = this.options.className,
-      container = L.DomUtil.create('div', 'leaflet-control-scale ' + className),
-      options = this.options;
+    var className = this.options.className;
+    var container = L.DomUtil.create('div', 'leaflet-control-scale ' + className);
+    var options = this.options;
 
     this._addScales(options, className, container);
 
@@ -72,128 +74,103 @@ L.Control.SwitchScaleControl = L.Control.extend({
     }
   },
 
-  onDropdownShow: function () {
-    this._customScaleInput.value = this.options.ratioCustomItemText;
+  _setScale: function (ratio) {
+    this._fixedScale = ratio;
+    var map = this._map;
+    var bounds = map.getBounds();
+    var centerLat = bounds.getCenter().lat;
+    var crsScale = this._pixelsInMeterWidth * this.options.getMapWidthForLanInMeters(centerLat) / ratio;
+    this._map.setZoom(map.options.crs.zoom(crsScale));
+    this._toggleDropdown();
+  },
+
+  _toggleDropdown: function () {
+    var height = this.dropdown.style['max-height'] === '0em' ? (this.options.scales.length * 2) : 0;
+    this.dropdown.style['max-height'] = height + 'em';
+    this.dropdown.style.border = height ? null : '0';
+  },
+
+  _addScale(ratio) {
+    var menuitem = L.DomUtil.create('div', this.options.className + '-scale-item', this.dropdown);
+
+    var scaleRatioText = ratio.toString();
+
+    // 1500000 -> 1'500'000
+    if (scaleRatioText.length > 3) {
+      var joinerChar = '\'';
+      scaleRatioText = scaleRatioText.split('').reverse().join('').replace(/([0-9]{3})/g, '$1' + joinerChar);
+      if (scaleRatioText[scaleRatioText.length - 1] === joinerChar) {
+        scaleRatioText = scaleRatioText.slice(0, -1);
+
+      }
+
+      scaleRatioText = scaleRatioText.split('').reverse().join('');
+    }
+
+    menuitem.innerHTML = this.options.ratioPrefix + scaleRatioText;
+
+    var setScale = this._setScale.bind(this);
+    menuitem.addEventListener('click', function () {
+      setScale(ratio);
+    });
   },
 
   _addScales: function (options, className, container) {
-    if (options.ratio) {
-      this._rScaleMenu = L.DomUtil.create('div', className + '-ratiomenu ui dropdown', container);
+    if (!options.ratio) return;
 
-      var scales = options.scales;
-      this._rScaleMenuText = L.DomUtil.create('text', '', this._rScaleMenu);
-      if (options.ratioMenu) {
-        var dropMenu = L.DomUtil.create('div', 'menu', this._rScaleMenu);
-        $.each(scales, function (i, scaleRatio) {
-          var menuitem = L.DomUtil.create('div', className + '-ratiomenu-item item', dropMenu);
-          menuitem.scaleRatio = scaleRatio;
-          menuitem.style.setProperty('padding', '0.2em', 'important');
-
-          var scaleRatioText = scaleRatio.toString();
-
-          // 1500000 -> 1'500'000
-          if (scaleRatioText.length > 3) {
-            var joinerChar = '\'';
-            scaleRatioText = scaleRatioText.split('').reverse().join('').replace(/([0-9]{3})/g, '$1' + joinerChar);
-            if (scaleRatioText[scaleRatioText.length - 1] === joinerChar) {
-              scaleRatioText = scaleRatioText.slice(0, -1);
-            }
-
-            scaleRatioText = scaleRatioText.split('').reverse().join('');
-          }
-
-          menuitem.innerHTML = options.ratioPrefix + scaleRatioText;
-        });
-
-        var setScaleRatio = function (scaleRatio) {
-          if (scaleRatio) {
-            var bounds = this._map.getBounds(),
-              centerLat = bounds.getCenter().lat,
-              crsScale = this._pixelsInMeterWidth * options.getMapWidthForLanInMeters(centerLat) / scaleRatio;
-            this._map.setZoom(this._map.options.crs.zoom(crsScale));
-          }
-        };
-
-        var myCustomScale = L.DomUtil.create('div', className + '-ratiomenu-item custom-scale', dropMenu);
-        myCustomScale.title = options.customScaleTitle;
-
-        var customScaleInput = L.DomUtil.create('input', className + '-customratio-input custom-scale-input', myCustomScale);
-        customScaleInput.type = 'text';
-        customScaleInput.setAttribute('value', options.ratioCustomItemText);
-        this._customScaleInput = customScaleInput;
-        var _this = this;
-
-        $(customScaleInput).on('focus', function (e) {
-          if (this.value === options.ratioCustomItemText) {
-            this.value = options.ratioPrefix;
-
-            // IE fix.
-            if (this.createTextRange) {
-              var r = this.createTextRange();
-              r.moveStart('character', this.value.length);
-              r.select();
-            }
-          }
-
-          e.stopPropagation();
-        });
-
-        $(customScaleInput).on('keydown', {
-          context: this
-        }, function (e) {
-          if (e.which === 13) {
-            $(_this._rScaleMenu).dropdown('hide');
-            var scaleRatioFound = this.value.replace(' ', '').replace('\'', '').match(/^(1:){0,1}([0-9]*)$/);
-            if (scaleRatioFound && scaleRatioFound[2]) {
-              var maxScale = Math.max.apply(null, scales);
-
-              if (_this.options.adjustScales && scaleRatioFound[2] > maxScale) {
-                var maxRatioItem = $(dropMenu).children('.' + className + '-ratiomenu-item.item').last();
-                $(maxRatioItem).click();
-              } else {
-                myCustomScale.scaleRatio = scaleRatioFound[2];
-                $(myCustomScale).click();
-              }
-            }
-
-            return false;
-          }
-
-          return true;
-        });
-
-        $(customScaleInput).on('keypress', {
-          context: this
-        }, function (e) {
-          if (e.charCode && (e.charCode < 48 || e.charCode > 57)) {
-            return false;
-          }
-        });
-
-        $(this._rScaleMenu).on('click', '.' + className + '-ratiomenu-item', {
-          context: this
-        }, function (e) {
-          if (this.scaleRatio) {
-            _this._fixedScale = this.scaleRatio;
-            $.proxy(setScaleRatio, e.data.context)(this.scaleRatio);
-            if ($(this).hasClass('custom-scale')) {
-              this.scaleRatio = undefined;
-            }
-          } else {
-            e.stopPropagation();
-          }
-        });
-
-        this._rScaleMenu.style.overflow = 'visible';
-
-        $(this._rScaleMenu).dropdown({
-          direction: _this.options.dropdownDirection,
-          onShow: function () {
-            _this.onDropdownShow.call(_this);
-          },
-        });
-      }
+    if (options.ratioMenu) {
+      this.dropdown = L.DomUtil.create('div', className + '-dropdown', container);
+      this._toggleDropdown();
     }
+    this.text = L.DomUtil.create('div', className + '-text', container);
+
+    if (!options.ratioMenu) return;
+
+    var _this = this;
+    var scales = options.scales;
+
+    this.text.addEventListener('click', this._toggleDropdown.bind(_this));
+
+    scales.forEach(this._addScale.bind(this));
+
+    var customScaleInput = L.DomUtil.create('input', className + '-custom-scale', this.dropdown);
+    customScaleInput.type = 'text';
+    customScaleInput.setAttribute('value', options.ratioCustomItemText);
+    customScaleInput.addEventListener('focus', function (e) {
+      if (this.value === options.ratioCustomItemText) {
+        this.value = options.ratioPrefix;
+
+        // IE fix.
+        if (this.createTextRange) {
+          var r = this.createTextRange();
+          r.moveStart('character', this.value.length);
+          r.select();
+        }
+      }
+
+      e.stopPropagation();
+    });
+
+    customScaleInput.addEventListener('keydown', function (e) {
+      if (e.which !== 13) return;
+
+      var scaleRatioFound = this.value.replace(' ', '').replace('\'', '').match(/^(1:){0,1}([0-9]*)$/);
+      if (scaleRatioFound && scaleRatioFound[2]) {
+        var maxScale = Math.max(scales);
+
+        if (_this.options.adjustScales && scaleRatioFound[2] > maxScale) {
+          _this._setScale.call(_this, scales[scales.length - 1]);
+        } else {
+          _this._setScale.call(_this, scaleRatioFound[2]);
+        }
+      }
+
+      e.preventDefault();
+    });
+
+    customScaleInput.addEventListener('keypress', function (e) {
+      if (e.charCode && (e.charCode < 48 || e.charCode > 57)) e.preventDefault();
+    });
   },
 
   _updateRound: function () {
@@ -205,14 +182,13 @@ L.Control.SwitchScaleControl = L.Control.extend({
   },
 
   _updateFunction: function (isRound) {
-    var dist,
-      bounds = this._map.getBounds(),
-      options = this.options;
+    var bounds = this._map.getBounds();
+    var options = this.options;
 
     var centerLat = bounds.getCenter().lat;
 
-    var size = this._map.getSize(),
-      physicalScaleRatio = 0;
+    var size = this._map.getSize();
+    var physicalScaleRatio = 0;
 
     if (size.x > 0) {
       if (options.ratio) {
@@ -231,11 +207,11 @@ L.Control.SwitchScaleControl = L.Control.extend({
 
   _updateRatio: function (physicalScaleRatio, isRound) {
     if (this._fixedScale) {
-      this._rScaleMenuText.innerHTML = this.options.ratioPrefix + this._fixedScale;
-      this._fixedScale = undefined;
+      this.text.innerHTML = this.options.ratioPrefix + this._fixedScale;
+      this._fixedScale = null;
     } else {
       var scaleText = isRound ? this._roundScale(physicalScaleRatio) : Math.round(physicalScaleRatio);
-      this._rScaleMenuText.innerHTML = this.options.ratioPrefix + scaleText;
+      this.text.innerHTML = this.options.ratioPrefix + scaleText;
     }
   },
 
@@ -257,5 +233,5 @@ L.Control.SwitchScaleControl = L.Control.extend({
     }
 
     return Math.round(physicalScaleRatio);
-  },
+  }
 });

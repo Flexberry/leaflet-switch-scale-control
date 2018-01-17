@@ -1,0 +1,29 @@
+{
+  "name": "leaflet-switch-scale-control",
+  "version": "0.6.1",
+  "description": "Leaflet switch scale control is used to select and display map scale from dropdown list",
+  "main": "src/L.Control.SwitchScaleControl.js",
+  "dependencies": {
+    "leaflet": "^1.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hbaltz/leaflet-switch-scale-control.git"
+  },
+  "keywords": [
+    "leaflet",
+    "switch",
+    "scale",
+    "control"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hbaltz/leaflet-switch-scale-control/issues"
+  },
+  "homepage": "https://github.com/hbaltz/leaflet-switch-scale-control#readme"
+}
