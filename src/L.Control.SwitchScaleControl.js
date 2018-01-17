@@ -1,5 +1,6 @@
 var L = require('leaflet');
 var $ = require('jquery');
+require('semantic-ui');
 
 L.Control.SwitchScaleControl = L.Control.extend({
   options: {
