@@ -2,9 +2,14 @@
 Leaflet switch scale control is used to select and display map scale from dropdown list. Depends on:
 * [Leaflet#1.2.0](http://leafletjs.com/reference-1.2.0.html)
 
-### [DEMO](https://flexberry.github.io/leaflet-switch-scale-control/examples/demo.html)
+### [DEMO](https://hbaltz.github.io/leaflet-switch-scale-control/examples/demo.html)
 
 ## API
+
+## Install
+```bash
+npm install leaflet-switch-scale-control
+```
 
 ### Usage
 ```javascript
