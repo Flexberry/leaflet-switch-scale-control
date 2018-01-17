@@ -1,3 +1,6 @@
+var L = require('leaflet');
+var $ = require('jquery');
+
 L.Control.SwitchScaleControl = L.Control.extend({
   options: {
     position: 'bottomleft',
