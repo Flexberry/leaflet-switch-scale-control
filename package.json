@@ -4,9 +4,7 @@
   "description": "Leaflet switch scale control is used to select and display map scale from dropdown list",
   "main": "src/L.Control.SwitchScaleControl.js",
   "dependencies": {
-    "leaflet": "^1.2.0",
-    "semantic-ui": "^2.2.4",
-    "jquery": "^3.2.1"
+    "leaflet": "^1.2.0"
   },
   "devDependencies": {},
   "scripts": {
