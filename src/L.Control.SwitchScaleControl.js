@@ -80,7 +80,8 @@ L.Control.SwitchScaleControl = L.Control.extend({
     var bounds = map.getBounds();
     var centerLat = bounds.getCenter().lat;
     var crsScale = this._pixelsInMeterWidth * this.options.getMapWidthForLanInMeters(centerLat) / ratio;
-    this._map.setZoom(map.options.crs.zoom(crsScale));
+    console.log(crsScale + ", "+ map.options.crs.zoom(crsScale));
+    this._map.setZoom(map.options.crs.zoom(crsScale)); 
     this._toggleDropdown();
   },
 
