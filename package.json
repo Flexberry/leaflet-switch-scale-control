@@ -1,6 +1,6 @@
 {
   "name": "leaflet-switch-scale-control",
-  "version": "0.6.1",
+  "version": "0.6.4",
   "description": "Leaflet switch scale control is used to select and display map scale from dropdown list",
   "main": "src/L.Control.SwitchScaleControl.js",
   "dependencies": {

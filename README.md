@@ -7,6 +7,11 @@ Leaflet switch scale control is used to select and display map scale from dropdo
 
 ## API
 
+## Install
+```bash
+npm install leaflet-switch-scale-control
+```
+
 ### Usage
 ```javascript
 map.addControl(new L.Control.SwitchScaleControl(options));

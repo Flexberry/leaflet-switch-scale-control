@@ -26,12 +26,27 @@
 
       L.control.scale().addTo(map);
 
-      setTimeout(function(){
-        map.addControl(new L.Control.SwitchScaleControl({
-          updateWhenIdle: true,
-          scales: [1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000, 25000000]
-        }));
-      }, 1000);
+      var options = {
+        position: 'bottomleft',
+        dropdownDirection: 'upward',
+        className: 'map-control-scalebar',
+        updateWhenIdle: false,
+        ratio: false,
+        ratioPrefix: '1:',
+        ratioCustomItemText: '1: Entrez une valeur',
+        customScaleTitle: 'Entrez une valeur et appuyez sur Entrée',
+        ratioMenu: true,
+        // If recalcOnZoomChange is false, then recalcOnPositionChange is always false.
+        recalcOnPositionChange: false,
+        recalcOnZoomChange: true,
+        scales: [500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000],
+        roundScales: null,
+        adjustScales: false
+    };
+
+      
+    map.addControl(new L.Control.SwitchScaleControl({options}));
+      
     </script>
   </body>
 </html>
