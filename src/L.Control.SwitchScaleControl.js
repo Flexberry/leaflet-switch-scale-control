@@ -11,7 +11,6 @@ L.Control.SwitchScaleControl = L.Control.extend({
     ratioCustomItemText: '1: Entrez une valeur',
     customScaleTitle: 'Entrez une valeur et appuyez sur ENtrée',
     ratioMenu: true,
-
     // If recalcOnZoomChange is false, then recalcOnPositionChange is always false.
     recalcOnPositionChange: false,
     recalcOnZoomChange: false,
@@ -80,7 +79,6 @@ L.Control.SwitchScaleControl = L.Control.extend({
     var bounds = map.getBounds();
     var centerLat = bounds.getCenter().lat;
     var crsScale = this._pixelsInMeterWidth * this.options.getMapWidthForLanInMeters(centerLat) / ratio;
-    console.log(crsScale + ", "+ map.options.crs.zoom(crsScale));
     this._map.setZoom(map.options.crs.zoom(crsScale)); 
     this._toggleDropdown();
   },
