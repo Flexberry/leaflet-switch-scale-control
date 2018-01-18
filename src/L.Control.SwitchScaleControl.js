@@ -100,6 +100,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
       scaleRatioText = scaleRatioText.split('').reverse().join('').replace(/([0-9]{3})/g, '$1' + joinerChar);
       if (scaleRatioText[scaleRatioText.length - 1] === joinerChar) {
         scaleRatioText = scaleRatioText.slice(0, -1);
+
       }
 
       scaleRatioText = scaleRatioText.split('').reverse().join('');

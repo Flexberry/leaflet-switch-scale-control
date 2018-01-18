@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Untitled Document.md</title><style></style></head><body id="preview">
+<h1><a id="LeafletSwitchScaleControl_0"></a>Leaflet-Switch-Scale-Control</h1>
+<p>Leaflet switch scale control is used to select and display map scale from dropdown list. Depends on:</p>
+<ul>
+<li><a href="http://leafletjs.com/reference-1.0.1.html">Leaflet#1.0.1</a></li>
+<li><a href="https://github.com/Semantic-Org/Semantic-UI">Semantic-UI#2.2.4</a></li>
+</ul>
+<h3><a id="DEMO"></a><a href="examples/demo.html">DEMO</a></h3>
+<h2><a id="API_5"></a>API</h2>
+<h3><a id="Usage_6"></a>Usage</h3>
+<pre><code class="language-javascript">map.addControl(<span class="hljs-keyword">new</span> L.Control.SwitchScaleControl(options));
+</code></pre>
+<h3><a id="Options_10"></a>Options</h3>
+<p>Specified below values are default</p>
+<pre><code class="language-json">    position: "bottomleft", // Leaflet control position.
+    dropdownDirection: "upward", // Specifies direction of dropdown's openning.
+    className: "map-control-scalebar", // Control's wrapper class.
+    updateWhenIdle: false, // Control's wrapper class.
+    ratio: true, // Flag: whether to display ratio prefix.
+    ratioPrefix: "1:", // Ratio prefix text.
+    ratioCustomItemText: "1: другой...", // Custom ratio text.
+    customScaleTitle: "Задайте свой масштаб и нажмите Enter", // Custom scale title text.
+    recalcOnPositionChange: false, // Flag: whether to recalc scale on map position change.
+    recalcOnZoomChange: false, // Flag: whether to recalc scale on map zoom change.
+    scales: [500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000], // Array of available to select scales
+    roundScales: undefined, // Array of available to display rounded scales
+    adjustScales: false, // Flag: whether to adjust custom scale to max of scales
+    pixelsInMeterWidth: function,
+    getMapWidthForLanInMeters: function
+</code></pre>
+<h4><a id="pixelsInMeterWidth_returns_pixels_per_meter_needed_if_ratio_true_29"></a>pixelsInMeterWidth: returns pixels per meter; needed if ratio: true.</h4>
+<pre><code class="language-javascript">    pixelsInMeterWidth: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+      <span class="hljs-keyword">var</span> div = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"div"</span>);
+      div.style.cssText = <span class="hljs-string">"position: absolute;  left: -100%;  top: -100%;  width: 100cm;"</span>;
+      <span class="hljs-built_in">document</span>.body.appendChild(div);
+      <span class="hljs-keyword">var</span> px = div.offsetWidth;
+      <span class="hljs-built_in">document</span>.body.removeChild(div);
+      <span class="hljs-keyword">return</span> px;
+    }
+</code></pre>
+<h4><a id="getMapWidthForLanInMeters_returns_width_of_map_in_meters_on_specified_latitude_40"></a>getMapWidthForLanInMeters: returns width of map in meters on specified latitude.</h4>
+<pre><code class="language-javascript">    getMapWidthForLanInMeters: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">currentLan</span>) </span>{
+      <span class="hljs-keyword">return</span> <span class="hljs-number">6378137</span> * <span class="hljs-number">2</span> * <span class="hljs-built_in">Math</span>.PI * <span class="hljs-built_in">Math</span>.cos(currentLan * <span class="hljs-built_in">Math</span>.PI / <span class="hljs-number">180</span>);
+    }
+</code></pre>
+
+</body></html>
