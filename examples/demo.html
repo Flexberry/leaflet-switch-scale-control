@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../src/L.Control.SwitchScaleControl.css" />
+    <link rel="stylesheet" href="./semantic.min.css" />
+    <link rel="stylesheet" href="./demo.css" />
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/leaflet-src.js"></script>
+    <script src="./js/semantic.min.js"></script>
+    <script src="../src/L.Control.SwitchScaleControl.js"></script>
+    <script>
+      var layer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      });
+
+      var map = L.map('map', {
+        zoomSnap: 0,
+        zoomDelta: 0.25,
+        zoomControl: false,
+        layers: [layer]
+      }).setView([58, 56.3], 10);
+
+      L.control.scale().addTo(map);
+
+      setTimeout(function(){
+        map.addControl(new L.Control.SwitchScaleControl({
+          updateWhenIdle: true,
+          scales: [1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000, 25000000]
+        }));
+      }, 1000);
+    </script>
+  </body>
+</html>
