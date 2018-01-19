@@ -9,7 +9,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
     ratio: true,
     ratioPrefix: '1:',
     ratioCustomItemText: '1: Entrez une valeur',
-    customScaleTitle: 'Entrez une valeur et appuyez sur ENtrée',
+    customScaleTitle: 'Entrez une valeur et appuyez sur Entrée',
     ratioMenu: true,
     // If recalcOnZoomChange is false, then recalcOnPositionChange is always false.
     recalcOnPositionChange: false,
@@ -17,6 +17,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
     scales: [500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000],
     roundScales: null,
     adjustScales: false,
+    splitScale: false, // if true 1:1500000 => 1:1'500'000
 
     // Returns pixels per meter; needed if ratio: true.
     pixelsInMeterWidth: function () {
@@ -93,9 +94,8 @@ L.Control.SwitchScaleControl = L.Control.extend({
     var menuitem = L.DomUtil.create('div', this.options.className + '-scale-item', this.dropdown);
 
     var scaleRatioText = ratio.toString();
-
-    // 1500000 -> 1'500'000
-    if (scaleRatioText.length > 3) {
+    
+    if (options.splitScale && scaleRatioText.length > 3) {
       var joinerChar = '\'';
       scaleRatioText = scaleRatioText.split('').reverse().join('').replace(/([0-9]{3})/g, '$1' + joinerChar);
       if (scaleRatioText[scaleRatioText.length - 1] === joinerChar) {
