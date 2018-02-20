@@ -80,7 +80,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
     var bounds = map.getBounds();
     var centerLat = bounds.getCenter().lat;
     var crsScale = this._pixelsInMeterWidth * this.options.getMapWidthForLanInMeters(centerLat) / ratio;
-    this._map.setZoom(map.options.crs.zoom(crsScale)); 
+    this._map.setZoom(map.options.crs.zoom(crsScale));
     this._toggleDropdown();
   },
 
@@ -90,11 +90,11 @@ L.Control.SwitchScaleControl = L.Control.extend({
     this.dropdown.style.border = height ? null : '0';
   },
 
-  _addScale(ratio) {
+  _addScale: function(ratio) {
     var menuitem = L.DomUtil.create('div', this.options.className + '-scale-item', this.dropdown);
 
     var scaleRatioText = ratio.toString();
-    
+
     if (options.splitScale && scaleRatioText.length > 3) {
       var joinerChar = '\'';
       scaleRatioText = scaleRatioText.split('').reverse().join('').replace(/([0-9]{3})/g, '$1' + joinerChar);
