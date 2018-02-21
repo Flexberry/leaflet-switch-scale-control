@@ -90,12 +90,12 @@ L.Control.SwitchScaleControl = L.Control.extend({
     this.dropdown.style.border = height ? null : '0';
   },
 
-  _addScale: function(ratio) {
+  _addScale: function (ratio) {
     var menuitem = L.DomUtil.create('div', this.options.className + '-scale-item', this.dropdown);
 
     var scaleRatioText = ratio.toString();
 
-    if (options.splitScale && scaleRatioText.length > 3) {
+    if (this.options.splitScale && scaleRatioText.length > 3) {
       var joinerChar = '\'';
       scaleRatioText = scaleRatioText.split('').reverse().join('').replace(/([0-9]{3})/g, '$1' + joinerChar);
       if (scaleRatioText[scaleRatioText.length - 1] === joinerChar) {
