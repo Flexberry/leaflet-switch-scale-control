@@ -1,15 +1,37 @@
-.map-control-scalebar-ratiomenu-item {
-  font-size: 0.9em !important;
+.map-control-scalebar-scale-item {
+  cursor:pointer;
+  padding: 2px 5px;
 }
 
-.map-control-scalebar-ratiomenu {
+.map-control-scalebar-scale-item:hover {
+  background: lightgray;
+}
+
+.map-control-scalebar-text {
+  cursor:pointer;
   height: 20px;
   border: 2px solid #777;
   border-top: none;
   padding: 2px 5px 1px;
   background: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  width: 60%;
 }
 
-.custom-scale-input {
-  padding: 0.2em !important;
+.map-control-scalebar-custom-scale {
+  padding: 0.2em;
+  width: 10em;
 }
+
+.map-control-scalebar-dropdown {
+  border: 2px solid #777;
+  border-bottom: none;
+  background: white;
+  max-height: 30em;
+  overflow-y: hidden;
+  -webkit-transition: max-height 0.2s ease-in-out;
+  -moz-transition: max-height 0.2s ease-in-out;
+  -o-transition: max-height 0.2s ease-in-out;
+  transition: max-height 0.2s ease-in-out;
+}
+
