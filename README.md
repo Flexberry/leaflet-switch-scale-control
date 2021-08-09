@@ -1,6 +1,6 @@
 # Leaflet-Switch-Scale-Control
 Leaflet switch scale control is used to select and display map scale from dropdown list. Depends on:
-* [Leaflet#1.3.1](https://leafletjs.com/reference-1.3.0.html)
+* [Leaflet#1.7.1](https://leafletjs.com/reference-1.7.1.html)
 * [Semantic-UI#2.2.4](https://github.com/Semantic-Org/Semantic-UI)
 ### [DEMO](https://flexberry.github.io/leaflet-switch-scale-control/examples/demo.html)
 ## API
