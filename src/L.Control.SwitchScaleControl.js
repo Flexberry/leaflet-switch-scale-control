@@ -109,7 +109,7 @@ L.Control.SwitchScaleControl = L.Control.extend({
         var setScaleRatio = function (scaleRatio) {
           if (scaleRatio) {
             // from https://github.com/datalyze-solutions/TileMapScaleLevels/blob/master/tilemapscalelevels.py#L52
-            var zoom = Math.log2((this._pixelsInMeterWidth * options.magic()) / scaleRatio).toFixed(1),
+            var zoom = Math.log2((this._pixelsInMeterWidth * options.magic()) / scaleRatio).toFixed(1);
             this._map.setZoom(zoom);
           }
         };
