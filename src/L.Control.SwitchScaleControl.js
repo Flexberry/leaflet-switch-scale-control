@@ -27,9 +27,10 @@ L.Control.SwitchScaleControl = L.Control.extend({
       return px;
     },
 
-    // Returns width of map in meters on specified latitude.
-    getMapWidthForLanInMeters: function (currentLan) {
-      return 6378137 * 2 * Math.PI * Math.cos(currentLan * Math.PI / 180);
+    // https://github.com/datalyze-solutions/TileMapScaleLevels/blob/master/tilemapscalelevels.py#L41
+    magic: function() {
+      // 256 - from function scale for CRS
+      return 6378137 * 2 * Math.PI / 256;
     }
   },
 
@@ -107,10 +108,9 @@ L.Control.SwitchScaleControl = L.Control.extend({
 
         var setScaleRatio = function (scaleRatio) {
           if (scaleRatio) {
-            var bounds = this._map.getBounds(),
-              centerLat = bounds.getCenter().lat,
-              crsScale = this._pixelsInMeterWidth * options.getMapWidthForLanInMeters(centerLat) / scaleRatio;
-            this._map.setZoom(this._map.options.crs.zoom(crsScale));
+            // from https://github.com/datalyze-solutions/TileMapScaleLevels/blob/master/tilemapscalelevels.py#L52
+            var zoom = Math.log2((this._pixelsInMeterWidth * options.magic()) / scaleRatio).toFixed(1);
+            this._map.setZoom(zoom);
           }
         };
 
@@ -205,18 +205,14 @@ L.Control.SwitchScaleControl = L.Control.extend({
   },
 
   _updateFunction: function (isRound) {
-    var dist,
-      bounds = this._map.getBounds(),
-      options = this.options;
-
-    var centerLat = bounds.getCenter().lat;
+    var options = this.options;
 
     var size = this._map.getSize(),
       physicalScaleRatio = 0;
 
     if (size.x > 0) {
       if (options.ratio) {
-        physicalScaleRatio = this._pixelsInMeterWidth * options.getMapWidthForLanInMeters(centerLat) / this._map.options.crs.scale(this._map.getZoom());
+        physicalScaleRatio = this._pixelsInMeterWidth * options.magic() / Math.pow(2, this._map.getZoom());
       }
     }
 
